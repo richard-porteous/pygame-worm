@@ -18,12 +18,20 @@ game_running = True
 
 held_keys = KeyInput()
 
+#define white
+white = (255,255,255)
+#clear the screen
+screen.fill(white)
+#Get the player image and a rectangle for size/position
+player = pygame.image.load("assets/player/blue_body_squircle.png")
+player_rect = player.get_rect()
+player_rect.center = width/2, height/2
+
 # GAME LOOP
 while game_running:
-    # event listeners 
-    # i.e. listen to key-presses or windows closing etc.
     game_running = held_keys.getEvents()
-
+    screen.fill(white)
+    screen.blit(player, player_rect)
     pygame.display.update()
 
 
