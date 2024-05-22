@@ -31,10 +31,24 @@ game_running = True
 
 held_keys = KeyInput()
 
-#define white
+#colors
 white = (255,255,255)
-#clear the screen
+black = (0,0,0)
+
+#clear the display
 screen.fill(white)
+
+#background - copy screen surface area
+background = pygame.Surface.copy(screen)
+
+#draw lines for the grid on the background
+for y in range(0, height, 40):
+    pygame.draw.line(background, black, (0,y), (width,y))
+for x in range(0, width,  40):
+    pygame.draw.line(background, black, (x,0), (x,height))
+
+# blit the background to screen
+screen.blit(background,(0,0))
 
 # Max frame rate
 clock = pygame.time.Clock()
@@ -56,7 +70,7 @@ while game_running:
     velocity = (dir[0] * dt * speed, dir[1] * dt * speed)
     player.rect = player.rect.move(velocity)
 
-    screen.fill(white)
+    screen.blit(background,(0,0))
     player.draw()
     pygame.display.update()
 
