@@ -13,6 +13,19 @@ screen = pygame.display.set_mode(size)
 # update the display to see what we set
 pygame.display.update()
 
+
+class GameObject():
+    
+    def __init__(self, img_name, initial_pos):
+        self.img = pygame.image.load(img_name)
+        self.rect = self.img.get_rect()
+        self.rect.center = initial_pos
+
+    def draw(self):
+        screen.blit(self.img, self.rect)
+
+
+
 # control variable
 game_running = True
 
@@ -22,16 +35,15 @@ held_keys = KeyInput()
 white = (255,255,255)
 #clear the screen
 screen.fill(white)
+
 #Get the player image and a rectangle for size/position
-player = pygame.image.load("assets/player/blue_body_squircle.png")
-player_rect = player.get_rect()
-player_rect.center = width/2, height/2
+player = GameObject("assets/player/blue_body_squircle.png", (width/2, height/2))
 
 # GAME LOOP
 while game_running:
     game_running = held_keys.getEvents()
     screen.fill(white)
-    screen.blit(player, player_rect)
+    player.draw()
     pygame.display.update()
 
 
