@@ -18,6 +18,7 @@ class GameObject():
     
     def __init__(self, img_name, initial_pos):
         self.img = pygame.image.load(img_name)
+        self.img = pygame.transform.scale_by(self.img, 0.5 )
         self.rect = self.img.get_rect()
         self.rect.center = initial_pos
 
@@ -55,8 +56,8 @@ clock = pygame.time.Clock()
 FPS = 60
 
 #Get the player image and a rectangle for size/position
-player = GameObject("assets/player/blue_body_squircle.png", (width/2, height/2))
-speed = 0.4
+player = GameObject("assets/player/blue_body_squircle.png", (width/2 - 20, height/2))
+speed = 0.2
 
 # GAME LOOP
 while game_running:
