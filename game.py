@@ -25,6 +25,15 @@ class GameObject():
     def draw(self):
         screen.blit(self.img, self.rect)
 
+class KinematicObject(GameObject):
+    def __init__(self, img_name, initial_pos):
+        super().__init__(img_name, initial_pos)
+        
+
+    def move(self, dir, dt , speed):
+        self.speed = speed
+        velocity = (int(dir[0] * dt * self.speed), int(dir[1] * dt * self.speed))
+        self.rect = self.rect.move(velocity)
 
 
 # control variable
@@ -56,7 +65,7 @@ clock = pygame.time.Clock()
 FPS = 60
 
 #Get the player image and a rectangle for size/position
-player = GameObject("assets/player/blue_body_squircle.png", (width/2 - 20, height/2))
+player = KinematicObject("assets/player/blue_body_squircle.png", (width/2 - 20, height/2))
 speed = 0.2
 
 # GAME LOOP
@@ -68,8 +77,7 @@ while game_running:
     game_running = held_keys.getEvents()
     dir = held_keys.get_direction()
 
-    velocity = (dir[0] * dt * speed, dir[1] * dt * speed)
-    player.rect = player.rect.move(velocity)
+    player.move(dir, dt, speed)
 
     screen.blit(background,(0,0))
     player.draw()
