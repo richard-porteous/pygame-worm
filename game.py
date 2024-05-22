@@ -36,12 +36,26 @@ white = (255,255,255)
 #clear the screen
 screen.fill(white)
 
+# Max frame rate
+clock = pygame.time.Clock()
+FPS = 60
+
 #Get the player image and a rectangle for size/position
 player = GameObject("assets/player/blue_body_squircle.png", (width/2, height/2))
+speed = 0.4
 
 # GAME LOOP
 while game_running:
+    # clock tick with a value will return the delta time
+    # as well as prevent clock speed being higher than FPS
+    dt = clock.tick(FPS)
+
     game_running = held_keys.getEvents()
+    dir = held_keys.get_direction()
+
+    velocity = (dir[0] * dt * speed, dir[1] * dt * speed)
+    player.rect = player.rect.move(velocity)
+
     screen.fill(white)
     player.draw()
     pygame.display.update()
