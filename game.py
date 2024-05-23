@@ -1,4 +1,4 @@
-# the pygame imports to make them usable in our game
+import random
 import pygame
 from pygame.locals import *
 from keyinput import *
@@ -20,7 +20,10 @@ class GameObject():
         self.img = pygame.image.load(img_name)
         self.img = pygame.transform.scale_by(self.img, 0.5 )
         self.rect = self.img.get_rect()
-        self.rect.center = initial_pos
+        self.set_pos(initial_pos)
+    
+    def set_pos(self, pos):
+        self.rect.center = pos
 
     def draw(self):
         screen.blit(self.img, self.rect)
@@ -46,6 +49,19 @@ class Player(KinematicObject):
 
     def set_speed(self, speed):
         self.speed = speed
+
+class Food(GameObject):
+    def __init__(self):
+        super().__init__("assets/food/tile_coin.png", (-1,-1))
+
+    def get_random_pos(self) -> tuple[int, int]:
+        x = random.randrange(0, int(width/40)) * 40 + 20
+        y = random.randrange(0, int(height/40)) * 40 + 20
+        return (x,y)
+    
+    def reposition(self):
+        pos = self.get_random_pos()
+        self.set_pos(pos)
 
 
 # control variable
@@ -78,6 +94,8 @@ FPS = 60
 
 #Get the player image and a rectangle for size/position
 player = Player((width/2 - 20, height/2), 0.2)
+food = Food()
+food.reposition()
 
 # GAME LOOP
 while game_running:
@@ -91,7 +109,10 @@ while game_running:
     player.move(dir, dt)
 
     screen.blit(background,(0,0))
+
+    food.draw()
     player.draw()
+    
     pygame.display.update()
 
 
