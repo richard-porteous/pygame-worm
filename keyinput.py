@@ -7,6 +7,7 @@ class KeyInput():
     def __init__(self) -> None:
         self.key_queue = []
         self.last_key_pressed = "none"
+        self.last_key_released = "none"
 
     def getEvents(self):
        
@@ -32,12 +33,16 @@ class KeyInput():
             if event.type==pygame.KEYUP:
                 if event.key in [K_DOWN]:
                     self.key_queue.remove("D")
+                    self.last_key_released = "D"
                 if event.key in [K_UP]:
                     self.key_queue.remove("U")
+                    self.last_key_released = "U"
                 if event.key in [K_RIGHT]:
                     self.key_queue.remove("R")
+                    self.last_key_released = "R"
                 if event.key in [K_LEFT]:
                     self.key_queue.remove("L")
+                    self.last_key_released = "L"
         
         return True
 
@@ -46,6 +51,7 @@ class KeyInput():
             return self.get_direction_vector(self.key_queue[0])
         else:
             return self.get_direction_vector(self.last_key_pressed)
+#            return self.get_direction_vector(self.last_key_released)
 
     def get_direction_vector(self, key_eval):
         match (key_eval):
