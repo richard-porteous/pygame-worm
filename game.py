@@ -107,6 +107,9 @@ while game_running:
     dir = held_keys.get_direction()
 
     player.move(dir, dt)
+    if Rect.collidepoint( food.rect, player.rect.center ):
+        food.reposition()
+
 
     screen.blit(background,(0,0))
 
