@@ -3,16 +3,42 @@ import pygame
 from pygame.locals import *
 from keyinput import *
 
+############################
+#### Set Up the Display ####
+############################
+
 # Initialize the pygame code
 pygame.init()
 
+#colors
+white = (255,255,255)
+black = (0,0,0)
 
-# set window size
+# Display
 size = width, height = (800, 600)
 screen = pygame.display.set_mode(size)
-# update the display to see what we set
 pygame.display.update()
 
+#clear the display
+screen.fill(white)
+background = pygame.Surface.copy(screen)
+
+#draw lines for the grid on the background
+for y in range(0, height, 40):
+    pygame.draw.line(background, black, (0,y), (width,y))
+for x in range(0, width,  40):
+    pygame.draw.line(background, black, (x,0), (x,height))
+
+# place the background on the screen
+screen.blit(background,(0,0))
+
+# Max frame rate
+clock = pygame.time.Clock()
+FPS = 60
+
+############################
+###### Game Classes ########
+############################
 
 class GameObject():
     
@@ -64,40 +90,24 @@ class Food(GameObject):
         self.set_pos(pos)
 
 
+############################
+###### Get Game ready ######
+############################
+
 # control variable
 game_running = True
 
 held_keys = KeyInput()
-
-#colors
-white = (255,255,255)
-black = (0,0,0)
-
-#clear the display
-screen.fill(white)
-
-#background - copy screen surface area
-background = pygame.Surface.copy(screen)
-
-#draw lines for the grid on the background
-for y in range(0, height, 40):
-    pygame.draw.line(background, black, (0,y), (width,y))
-for x in range(0, width,  40):
-    pygame.draw.line(background, black, (x,0), (x,height))
-
-# blit the background to screen
-screen.blit(background,(0,0))
-
-# Max frame rate
-clock = pygame.time.Clock()
-FPS = 60
 
 #Get the player image and a rectangle for size/position
 player = Player((width/2 - 20, height/2), 0.2)
 food = Food()
 food.reposition()
 
-# GAME LOOP
+############################
+######### GAME LOOP ########
+############################
+
 while game_running:
     # clock tick with a value will return the delta time
     # as well as prevent clock speed being higher than FPS
@@ -118,6 +128,9 @@ while game_running:
     
     pygame.display.update()
 
+############################
+### quit window clean up ###
+############################
 
-# quit the pygame window
 pygame.quit()
+
