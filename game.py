@@ -54,14 +54,39 @@ class GameObject():
     def draw(self):
         screen.blit(self.img, self.rect)
 
+
 class KinematicObject(GameObject):
+
     def __init__(self, img_name, initial_pos):
         super().__init__(img_name, initial_pos)
+    
+    def set_next_move(self, velocity):
+        # python scope - look it up!
+        if velocity[1] != 0:
+            d = velocity[1]
+            p = self.rect.center[1]
+        else:
+            d = velocity[0]
+            p = self.rect.center[0]
+
+        t = int(p/40) * 40 + 20
+        e = p + d
+        o = e - t
+        print(d,p,t,e,o)
+        if d > 0 and p < t and t <= e:
+                print(p, "crossed", t," by ", o )
         
+        if d < 0 and p > t and t >= e:
+                print(p, "crossed", t," by ", o )
+
+
     def move(self, dir, dt , speed):
         self.speed = speed
-        velocity = (int(dir[0] * dt * self.speed), int(dir[1] * dt * self.speed))
+        dist = int(dt * speed)
+        velocity = (dir[0] * dist), (dir[1] * dist)
+        self.set_next_move(velocity)
         self.rect = self.rect.move(velocity)
+
 
 class Player(KinematicObject):
     speed = 0.2
