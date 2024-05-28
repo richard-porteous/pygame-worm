@@ -56,10 +56,14 @@ class GameObject():
 
 
 class KinematicObject(GameObject):
+    last_dir = [0,0]
 
     def __init__(self, img_name, initial_pos):
         super().__init__(img_name, initial_pos)
     
+    def calc_current_tile_axis_center(self, pos_axis):
+        return int(pos_axis/40) * 40 + 20
+
     def set_next_move(self, velocity):
         # python scope - look it up!
         if velocity[1] != 0:
@@ -69,22 +73,37 @@ class KinematicObject(GameObject):
             d = velocity[0]
             p = self.rect.center[0]
 
-        t = int(p/40) * 40 + 20
+        t = self.calc_current_tile_axis_center(p)
         e = p + d
         o = e - t
-        print(d,p,t,e,o)
+        
         if d > 0 and p < t and t <= e:
-                print(p, "crossed", t," by ", o )
+            return [True, o]
         
         if d < 0 and p > t and t >= e:
-                print(p, "crossed", t," by ", o )
+            return [True, o]
+        
+        return [False, o]
 
-
-    def move(self, dir, dt , speed):
+    def move(self, dir_req, dt , speed):
         self.speed = speed
         dist = int(dt * speed)
+        if self.last_dir[0] == 0 and self.last_dir[1] == 0:
+            self.last_dir = dir_req
+            dir = dir_req
+        else:
+            dir = self.last_dir
+
         velocity = (dir[0] * dist), (dir[1] * dist)
-        self.set_next_move(velocity)
+        passed_center, overshoot = self.set_next_move(velocity)
+
+        if passed_center:
+            self.rect.center = (self.calc_current_tile_axis_center(self.rect.center[0]), \
+                    self.calc_current_tile_axis_center(self.rect.center[1]))
+            self.last_dir = dir_req
+            dir = dir_req
+            velocity = (dir[0] * abs(overshoot), dir[1] * abs(overshoot))
+        
         self.rect = self.rect.move(velocity)
 
 
