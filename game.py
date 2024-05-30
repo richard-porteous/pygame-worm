@@ -109,6 +109,7 @@ class KinematicObject(GameObject):
 
 class Player(KinematicObject):
     speed = 0.2
+    tailpieces = []
 
     def __init__(self, initial_pos, speed):
         super().__init__("assets/player/blue_body_squircle.png",  initial_pos)
@@ -119,6 +120,23 @@ class Player(KinematicObject):
 
     def set_speed(self, speed):
         self.speed = speed
+
+    def grow_tail(self, initial_pos):
+        t = Tail(initial_pos, self.speed)
+        self.tailpieces.append(t)
+    
+    def draw(self):
+        super().draw()
+        for t in self.tailpieces:
+            t.draw()
+
+class Tail(GameObject):
+    speed = 0.2
+
+    def __init__(self, initial_pos, speed):
+        super().__init__("assets/player/blue_body_circle.png",  initial_pos)
+        self.speed = speed
+
 
 class Food(GameObject):
     def __init__(self):
@@ -132,6 +150,7 @@ class Food(GameObject):
     def reposition(self):
         pos = self.get_random_pos()
         self.set_pos(pos)
+
 
 
 ############################
@@ -161,7 +180,8 @@ while game_running:
     dir = held_keys.get_direction()
 
     player.move(dir, dt)
-    if Rect.collidepoint( food.rect, player.rect.center ):
+    if Rect.collidepoint(food.rect, player.rect.center):
+        player.grow_tail(food.rect.center)
         food.reposition()
 
 
