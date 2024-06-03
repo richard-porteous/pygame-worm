@@ -186,7 +186,8 @@ class KinematicObject(GameObject):
         self.rect = self.rect.move(velocity)
 
         self.dist = dist
-        self.final_dist = dist
+        self.final_dist = final_dist
+        return passed_center
 
 
 class Player(KinematicObject):
@@ -197,15 +198,16 @@ class Player(KinematicObject):
         self.speed = speed
 
     def move(self, dir, dt ):
-        print("NEW MOVE")
-        super().move(dir, dt, self.speed)
+        #print("NEW MOVE")
+        passed_center = super().move(dir, dt, self.speed)
         object_to_follow = self
         for t in self.tailpieces:
-            t.follow(object_to_follow)
+            t.follow(object_to_follow, passed_center)
             object_to_follow = t
 
     def grow_tail(self, initial_t_pos):
-        t = Tail(initial_t_pos, self.speed)
+        l = len(self.tailpieces)
+        t = Tail(initial_t_pos, self.speed, str(l))
         self.tailpieces.append(t)
     
     def draw(self):
@@ -214,7 +216,10 @@ class Player(KinematicObject):
             t.draw()
 
 class Tail(GameObject):
+    name = "tp"
     speed = 0.2
+    last_dir_moved = [0,0]
+    last_center_reached = (0,0)
     ## this is pass back info
     prev_dir_moved = [0,0]
     prev_center_reached = (0,0)
@@ -222,12 +227,28 @@ class Tail(GameObject):
     final_dist = 0
     ##
 
-    def __init__(self, initial_t_pos, speed):
+    def __init__(self, initial_t_pos, speed, name):
         super().__init__("assets/player/blue_body_circle.png",  initial_t_pos)
         self.speed = speed
+        self.name += name
 
-    def follow(self, object_to_follow):
-        pass
+    def follow(self, object_to_follow, passed_center):
+        self.dist = object_to_follow.dist
+        self.final_dist = object_to_follow.final_dist
+        if passed_center:
+            self.prev_dir_moved = self.last_dir_moved
+            self.prev_center_reached = self.last_center_reached
+            self.last_center_reached = object_to_follow.prev_center_reached
+            self.last_dir_moved = object_to_follow.prev_dir_moved
+            self.rect.center = self.last_center_reached
+            velocity = (self.last_dir_moved[0] * self.final_dist, self.last_dir_moved[1] * self.final_dist)
+            #print("pc_follow", self.name, velocity)
+        else:
+            velocity = (self.last_dir_moved[0] * self.dist), (self.last_dir_moved[1] * self.dist)
+            #print("follow", self.name, velocity)
+
+        self.rect = self.rect.move(velocity)
+
 
 class Food(GameObject):
     def __init__(self):
