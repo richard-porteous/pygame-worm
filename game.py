@@ -140,34 +140,41 @@ class GameObject():
 
 class KinematicObject(GameObject):
     speed = 0.2
-    last_dir = [0,0]
-    last_center = (0,0)
+    last_dir_moved = [0,0]
+    last_center_reached = (0,0)
+    ## this is pass back info
+    prev_dir_moved = [0,0]
+    prev_center_reached = (0,0)
+    dist = 0
+    final_dist = 0
+    ##
+    
 
     def __init__(self, img_name, initial_t_pos):
         super().__init__(img_name, initial_t_pos)
     
-    
-
-
     def move(self, dir_req, dt , speed):
         self.speed = speed
         dist = int(dt * speed)
-        final_dist = dist
-        if self.last_dir[0] == 0 and self.last_dir[1] == 0:
-            self.last_dir = dir_req
+        final_dist = 0
+        if self.last_dir_moved[0] == 0 and self.last_dir_moved[1] == 0:
+            self.last_dir_moved = dir_req
             dir = dir_req
         else:
-            dir = self.last_dir
+            dir = self.last_dir_moved
 
         velocity = (dir[0] * dist), (dir[1] * dist)
 
         passed_center, overshoot = detect_center_reached(self.rect.center, velocity)
         if passed_center:
+            self.prev_dir_moved = self.last_dir_moved
+            self.prev_center_reached = self.last_center_reached
+
             x = calc_current_tile_axis_center_pos(self.rect.center[0])
             y = calc_current_tile_axis_center_pos(self.rect.center[1])
             self.rect.center = (x, y)
-            self.last_center = (x, y)
-            self.last_dir = dir_req
+            self.last_center_reached = (x, y)
+            self.last_dir_moved = dir_req
             dir = dir_req
             final_dist = abs(overshoot)
             velocity = (dir[0] * final_dist, dir[1] * final_dist)
@@ -177,7 +184,9 @@ class KinematicObject(GameObject):
             self.rect.center = pos_d
 
         self.rect = self.rect.move(velocity)
-        return final_dist
+
+        self.dist = dist
+        self.final_dist = dist
 
 
 class Player(KinematicObject):
@@ -188,7 +197,12 @@ class Player(KinematicObject):
         self.speed = speed
 
     def move(self, dir, dt ):
+        print("NEW MOVE")
         super().move(dir, dt, self.speed)
+        object_to_follow = self
+        for t in self.tailpieces:
+            t.follow(object_to_follow)
+            object_to_follow = t
 
     def grow_tail(self, initial_t_pos):
         t = Tail(initial_t_pos, self.speed)
@@ -201,11 +215,19 @@ class Player(KinematicObject):
 
 class Tail(GameObject):
     speed = 0.2
+    ## this is pass back info
+    prev_dir_moved = [0,0]
+    prev_center_reached = (0,0)
+    dist = 0
+    final_dist = 0
+    ##
 
     def __init__(self, initial_t_pos, speed):
         super().__init__("assets/player/blue_body_circle.png",  initial_t_pos)
         self.speed = speed
 
+    def follow(self, object_to_follow):
+        pass
 
 class Food(GameObject):
     def __init__(self):
