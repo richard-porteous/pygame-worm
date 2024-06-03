@@ -59,17 +59,6 @@ def calc_current_tile_axis_center_pos(pos_axis):
     axs = int(math.copysign(1,pos_axis))
     return axs * int(abs(pos_axis)/TILESQRT) * TILESQRT + int(TILESQRT/2)
 
-def get_direction_from_position_diff(end_pos, start_pos):
-    dirx = 0
-    diry = 0
-    if end_pos[0] - start_pos[0] != 0:
-        dirx = int(math.copysign(1,end_pos[0] - start_pos[0]))
-    if end_pos[1] - start_pos[1] != 0:
-        diry = int(math.copysign(1,end_pos[1] - start_pos[1]))
-    
-    return [dirx,diry]
-
-
 def detect_edges(dir, pos):
     boundry = "none"
     right_pos = calc_current_tile_axis_center_pos(width-1)
@@ -126,6 +115,7 @@ class GameObject():
 
 
 class KinematicObject(GameObject):
+    speed = 0.2
     last_dir = [0,0]
     last_center = (0,0)
 
@@ -185,7 +175,6 @@ class KinematicObject(GameObject):
 
 
 class Player(KinematicObject):
-    speed = 0.2
     tailpieces = []
 
     def __init__(self, initial_pos, speed):
