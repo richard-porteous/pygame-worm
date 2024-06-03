@@ -93,6 +93,30 @@ def detect_edges(dir, pos):
 
     return (False, dir, pos)
 
+def detect_center_reached(pos, velocity):
+    """
+    All values are single axis. 
+    Returns: tile_center_reached, overshoot_amount
+    """
+
+    if velocity[1] == 0:
+        dist = velocity[0]
+        obj_center = pos[0]
+    else:
+        dist = velocity[1]
+        obj_center = pos[1]
+
+    tile_center = calc_current_tile_axis_center_pos(obj_center)
+    full_move_pos = obj_center + dist
+    overshoot = full_move_pos - tile_center
+    
+    if dist > 0 and obj_center < tile_center and tile_center <= full_move_pos:
+        return [True, overshoot]
+    
+    if dist < 0 and obj_center > tile_center and tile_center >= full_move_pos:
+        return [True, overshoot]
+
+    return [False, overshoot]
 
 ############################
 ###### Game Classes ########
@@ -123,30 +147,7 @@ class KinematicObject(GameObject):
         super().__init__(img_name, initial_t_pos)
     
     
-    def check_tile_center_reached(self, velocity):
-        """
-        All values are single axis. 
-        Returns: tile_center_reached, overshoot_amount
-        """
 
-        if velocity[1] != 0:
-            dist = velocity[1]
-            obj_center = self.rect.center[1]
-        else:
-            dist = velocity[0]
-            obj_center = self.rect.center[0]
-
-        tile_center = calc_current_tile_axis_center_pos(obj_center)
-        full_move_pos = obj_center + dist
-        overshoot = full_move_pos - tile_center
-        
-        if dist > 0 and obj_center < tile_center and tile_center <= full_move_pos:
-            return [True, overshoot]
-        
-        if dist < 0 and obj_center > tile_center and tile_center >= full_move_pos:
-            return [True, overshoot]
-
-        return [False, overshoot]
 
     def move(self, dir_req, dt , speed):
         self.speed = speed
@@ -160,7 +161,7 @@ class KinematicObject(GameObject):
 
         velocity = (dir[0] * dist), (dir[1] * dist)
 
-        passed_center, overshoot = self.check_tile_center_reached(velocity)
+        passed_center, overshoot = detect_center_reached(self.rect.center, velocity)
         if passed_center:
             x = calc_current_tile_axis_center_pos(self.rect.center[0])
             y = calc_current_tile_axis_center_pos(self.rect.center[1])
