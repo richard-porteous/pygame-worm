@@ -122,26 +122,31 @@ class KinematicObject(GameObject):
     def __init__(self, img_name, initial_t_pos):
         super().__init__(img_name, initial_t_pos)
     
-    def set_next_move(self, velocity):
-        # python scope - look it up!
+    
+    def check_tile_center_reached(self, velocity):
+        """
+        All values are single axis. 
+        Returns: tile_center_reached, overshoot_amount
+        """
+
         if velocity[1] != 0:
-            d = velocity[1]
-            p = self.rect.center[1]
+            dist = velocity[1]
+            obj_center = self.rect.center[1]
         else:
-            d = velocity[0]
-            p = self.rect.center[0]
+            dist = velocity[0]
+            obj_center = self.rect.center[0]
 
-        t = calc_current_tile_axis_center_pos(p)
-        e = p + d
-        o = e - t
+        tile_center = calc_current_tile_axis_center_pos(obj_center)
+        full_move_pos = obj_center + dist
+        overshoot = full_move_pos - tile_center
         
-        if d > 0 and p < t and t <= e:
-            return [True, o]
+        if dist > 0 and obj_center < tile_center and tile_center <= full_move_pos:
+            return [True, overshoot]
         
-        if d < 0 and p > t and t >= e:
-            return [True, o]
+        if dist < 0 and obj_center > tile_center and tile_center >= full_move_pos:
+            return [True, overshoot]
 
-        return [False, o]
+        return [False, overshoot]
 
     def move(self, dir_req, dt , speed):
         self.speed = speed
@@ -154,8 +159,8 @@ class KinematicObject(GameObject):
             dir = self.last_dir
 
         velocity = (dir[0] * dist), (dir[1] * dist)
-        passed_center, overshoot = self.set_next_move(velocity)
 
+        passed_center, overshoot = self.check_tile_center_reached(velocity)
         if passed_center:
             x = calc_current_tile_axis_center_pos(self.rect.center[0])
             y = calc_current_tile_axis_center_pos(self.rect.center[1])
